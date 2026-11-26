@@ -30,7 +30,11 @@ export default function PlanViewer({ plan }) {
         </button>
       </div>
 
-      <PlanNotice sample={!!plan.generation_note || undefined} />
+      <PlanNotice
+        generic={false}
+        freeAi={String(plan.ai_model_used || '').startsWith('Pollinations')}
+        sample={String(plan.ai_model_used || 'mock').startsWith('mock')}
+      />
 
       {/* Steps */}
       {plan.steps?.length > 0 && (
