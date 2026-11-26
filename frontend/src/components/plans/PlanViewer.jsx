@@ -1,5 +1,6 @@
 import { Printer, Clock, AlertTriangle, Wrench, ArrowRight, CloudSun } from 'lucide-react'
 import Card from '../common/Card'
+import PlanNotice from './PlanNotice'
 import FeedbackForm from '../feedback/FeedbackForm'
 
 export default function PlanViewer({ plan }) {
@@ -28,6 +29,8 @@ export default function PlanViewer({ plan }) {
           Print
         </button>
       </div>
+
+      <PlanNotice sample={!!plan.generation_note || undefined} />
 
       {/* Steps */}
       {plan.steps?.length > 0 && (
