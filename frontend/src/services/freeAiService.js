@@ -60,7 +60,14 @@ export async function generateWithFreeAI(activityInput, userProfile) {
     const raw = data.choices?.[0]?.message?.content
     if (!raw) throw new Error('Empty response from free AI')
     const a = raw.indexOf('{'), b = raw.lastIndexOf('}')
-    const plan = parseResponse(a >= 0 && b > a ? raw.slice(a, b + 1) : raw)
+    let obj = null
+    try { obj = JSON.parse(a >= 0 && b > a ? raw.slice(a, b + 1) : raw) } catch { /* handled below */ }
+    if (obj && !Array.isArray(obj.steps)) {
+      const alt = obj.plan?.steps || obj.plan_steps || obj.step_by_step_plan || obj.step_by_step || obj.stepByStepPlan
+      if (Array.isArray(alt)) obj.steps = alt
+    }
+    if (!obj || !Array.isArray(obj.steps)) throw new Error('Free AI returned unusable JSON: ' + (obj ? Object.keys(obj).join(',') : String(raw).slice(0, 120)))
+    const plan = parseResponse(JSON.stringify(obj))
     if (!plan.steps.length) throw new Error('Free AI returned no steps: ' + String(raw).slice(0, 200))
     enrichPlan(plan, activityInput)
     plan.generation_note =
