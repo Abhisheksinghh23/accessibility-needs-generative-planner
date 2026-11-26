@@ -443,7 +443,7 @@ export function buildPlanForType(activityType, userInput = {}) {
     activity_type: activityType,
     generated_at: new Date().toISOString(),
     summary: userInput.description
-      ? `Generic ${activityType} checklist. It is not tailored to "${userInput.description.slice(0, 80)}" because the live AI was unavailable. Use it as a starting point only.`
+      ? `Generic ${activityType} checklist. It is a sample, not tailored to "${userInput.description.slice(0, 80)}". Use it as a starting point only.`
       : template.summary,
     generation_note: 'This plan was generated locally for demonstration purposes.',
     ...(userInput.destination && {
