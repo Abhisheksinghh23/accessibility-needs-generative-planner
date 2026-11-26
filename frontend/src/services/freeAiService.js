@@ -44,7 +44,7 @@ export async function generateWithFreeAI(activityInput, userProfile) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: ctrl.signal,
-        body: JSON.stringify({ model: 'openai', temperature: 0.4, messages, response_format: { type: 'json_object' } }),
+        body: JSON.stringify({ model: 'openai', temperature: 0.4, max_tokens: 4000, messages, response_format: { type: 'json_object' } }),
       })
     let res = await call()
     if (res.status === 402 || res.status === 429) {
@@ -59,8 +59,9 @@ export async function generateWithFreeAI(activityInput, userProfile) {
     const data = await res.json()
     const raw = data.choices?.[0]?.message?.content
     if (!raw) throw new Error('Empty response from free AI')
-    const plan = parseResponse(raw)
-    if (!plan.steps.length) throw new Error('Free AI returned no steps')
+    const a = raw.indexOf('{'), b = raw.lastIndexOf('}')
+    const plan = parseResponse(a >= 0 && b > a ? raw.slice(a, b + 1) : raw)
+    if (!plan.steps.length) throw new Error('Free AI returned no steps: ' + String(raw).slice(0, 200))
     enrichPlan(plan, activityInput)
     plan.generation_note =
       'This plan was written by a free AI model (Pollinations.ai, gpt-oss-20b), not OpenAI. It can be wrong. Verify accessibility details with the venue or service provider.'
