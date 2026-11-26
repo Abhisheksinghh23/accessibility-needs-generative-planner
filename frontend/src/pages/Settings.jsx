@@ -4,6 +4,8 @@ import { ThemeContext } from '../context/ThemeContext'
 import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 
+import { goTo } from '../utils/navigation'
+
 export default function Settings() {
   const { darkMode, toggleDarkMode, fontSize, changeFontSize, highContrast, toggleHighContrast } = useContext(ThemeContext)
   const [passwordMsg, setPasswordMsg] = useState('')
@@ -90,7 +92,7 @@ export default function Settings() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           Update your disability profile and preferences.
         </p>
-        <Button variant="outline" onClick={() => window.location.href = '/profile-setup'}>
+        <Button variant="outline" onClick={() => goTo('/profile-setup')}>
           Edit Profile
         </Button>
       </Card>
