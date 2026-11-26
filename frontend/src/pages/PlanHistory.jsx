@@ -15,6 +15,9 @@ const activityTypes = [
   { value: 'custom', label: 'Custom' },
 ]
 
+import { goTo } from '../utils/navigation'
+import PlanNotice from '../components/plans/PlanNotice'
+
 export default function PlanHistory() {
   const { plans, loading, pagination, fetchPlans, deletePlan } = usePlans()
   const [filter, setFilter] = useState('')
@@ -45,6 +48,8 @@ export default function PlanHistory() {
           ))}
         </select>
       </div>
+
+      <div className="mb-6"><PlanNotice /></div>
 
       {loading ? (
         <Loader text="Loading plans..." />
@@ -85,7 +90,7 @@ export default function PlanHistory() {
             {filter ? 'No plans match this filter.' : 'Start by generating your first accessibility plan.'}
           </p>
           {!filter && (
-            <Button onClick={() => window.location.href = '/generate-plan'}>
+            <Button onClick={() => goTo('/generate-plan')}>
               Generate Your First Plan
             </Button>
           )}
