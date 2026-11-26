@@ -16,7 +16,8 @@ function getUserProfile() {
   return profiles.find((p) => p.user_id === userId) || null
 }
 
-export const generatePlan = async (activityInput) => {
+export const generatePlan = async (rawInput) => {
+  const { use_free_ai: consentedToFreeAi, ...activityInput } = rawInput || {}
   const userId = getCurrentUserId()
   if (!userId) throw { response: { status: 401, data: { error: 'Not authenticated' } } }
 
@@ -34,7 +35,7 @@ export const generatePlan = async (activityInput) => {
       generatedPlan = buildPlanForType(activityInput.activity_type || 'custom', activityInput)
       modelUsed = 'mock-local (fallback)'
     }
-  } else if (IS_DEMO) {
+  } else if (IS_DEMO && consentedToFreeAi === true) {
     try {
       generatedPlan = await generateWithFreeAI(activityInput, getUserProfile())
       modelUsed = FREE_AI_LABEL
