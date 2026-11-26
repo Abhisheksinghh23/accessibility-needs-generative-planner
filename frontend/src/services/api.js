@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { goTo } from '../utils/navigation'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -23,7 +24,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      goTo('/login')
     }
     return Promise.reject(error)
   }
