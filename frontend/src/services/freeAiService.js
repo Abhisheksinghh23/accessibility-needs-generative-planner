@@ -14,6 +14,31 @@ const SAFETY =
   '\n\nImportant: never invent specific real bus/train numbers, stop names, venue facts, opening hours or measurements. ' +
   'Give general guidance and say what the user should verify with the venue or operator. Keep to 5 or 6 steps. Stay strictly on the activity the user described.'
 
+// If the model output was cut off, drop the unfinished tail and close open brackets.
+function repairJson(text) {
+  let cut = text
+  for (let i = 0; i < 40; i++) {
+    const stack = []
+    let inStr = false
+    let esc = false
+    for (const ch of cut) {
+      if (inStr) {
+        if (esc) esc = false
+        else if (ch === '\\') esc = true
+        else if (ch === '"') inStr = false
+      } else if (ch === '"') inStr = true
+      else if (ch === '{' || ch === '[') stack.push(ch === '{' ? '}' : ']')
+      else if (ch === '}' || ch === ']') stack.pop()
+    }
+    const candidate = cut.replace(/[,\s]+$/, '') + (inStr ? '"' : '') + stack.reverse().join('')
+    try { return JSON.parse(candidate) } catch { /* trim further */ }
+    const last = Math.max(cut.lastIndexOf('},'), cut.lastIndexOf('],'), cut.lastIndexOf('"},'))
+    if (last <= 0) return null
+    cut = cut.slice(0, last + 1)
+  }
+  return null
+}
+
 export function freeAiAvailable() {
   return true
 }
@@ -61,12 +86,13 @@ export async function generateWithFreeAI(activityInput, userProfile) {
     if (!raw) throw new Error('Empty response from free AI')
     const a = raw.indexOf('{'), b = raw.lastIndexOf('}')
     let obj = null
-    try { obj = JSON.parse(a >= 0 && b > a ? raw.slice(a, b + 1) : raw) } catch { /* handled below */ }
+    let parseErr = ''
+    try { obj = JSON.parse(a >= 0 && b > a ? raw.slice(a, b + 1) : raw) } catch (e) { parseErr = e.message; obj = repairJson(raw.slice(Math.max(a, 0))) }
     if (obj && !Array.isArray(obj.steps)) {
       const alt = obj.plan?.steps || obj.plan_steps || obj.step_by_step_plan || obj.step_by_step || obj.stepByStepPlan
       if (Array.isArray(alt)) obj.steps = alt
     }
-    if (!obj || !Array.isArray(obj.steps)) throw new Error('Free AI returned unusable JSON: ' + (obj ? Object.keys(obj).join(',') : String(raw).slice(0, 120)))
+    if (!obj || !Array.isArray(obj.steps)) throw new Error('Free AI returned unusable JSON: ' + (obj ? Object.keys(obj).join(',') : parseErr + ' len=' + String(raw).length + ' tail=' + String(raw).slice(-120)))
     const plan = parseResponse(JSON.stringify(obj))
     if (!plan.steps.length) throw new Error('Free AI returned no steps: ' + String(raw).slice(0, 200))
     enrichPlan(plan, activityInput)
