@@ -6,9 +6,9 @@ import { buildMessages, parseResponse, enrichPlan } from './openaiService'
 
 const URL = 'https://text.pollinations.ai/openai'
 export const FREE_AI_LABEL = 'Pollinations.ai free model (gpt-oss-20b)'
-const MIN_GAP_MS = 20000
+const MIN_GAP_MS = 5000
 const MAX_PER_SESSION = 15
-const TIMEOUT_MS = 60000
+const TIMEOUT_MS = 110000
 
 const SAFETY =
   '\n\nImportant: never invent specific real bus/train numbers, stop names, venue facts, opening hours or measurements. ' +
@@ -39,12 +39,22 @@ export async function generateWithFreeAI(activityInput, userProfile) {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
   try {
-    const res = await fetch(URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: ctrl.signal,
-      body: JSON.stringify({ model: 'openai', temperature: 0.4, messages, response_format: { type: 'json_object' } }),
-    })
+    const call = () =>
+      fetch(URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: ctrl.signal,
+        body: JSON.stringify({ model: 'openai', temperature: 0.4, messages, response_format: { type: 'json_object' } }),
+      })
+    let res = await call()
+    if (res.status === 402 || res.status === 429) {
+      // The free tier allows about one reply per 45 seconds per IP. Wait once, then retry.
+      const body = await res.text()
+      const m = /retry after (\d+)s/i.exec(body)
+      const wait = Math.min(Number(m?.[1] || 45), 50)
+      await new Promise((r) => setTimeout(r, (wait + 1) * 1000))
+      res = await call()
+    }
     if (!res.ok) throw new Error(`Free AI error: ${res.status}`)
     const data = await res.json()
     const raw = data.choices?.[0]?.message?.content
