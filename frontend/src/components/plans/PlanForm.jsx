@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Mic, Sparkles } from 'lucide-react'
 import Button from '../common/Button'
 import Input from '../common/Input'
+import { IS_DEMO } from '../../utils/navigation'
 
 const activityTypes = [
   { value: 'commute', label: 'Commute' },
@@ -21,11 +22,12 @@ export default function PlanForm({ onSubmit, loading }) {
     end_time: '',
     destination: '',
     special_requirements: '',
+    use_free_ai: false,
   })
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    const { name, value, type, checked } = e.target
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
   }
 
   const handleSubmit = (e) => {
@@ -128,6 +130,29 @@ export default function PlanForm({ onSubmit, loading }) {
           className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
+
+      {IS_DEMO && (
+        <div className="rounded-lg border border-gray-300 dark:border-gray-600 p-4 text-sm text-gray-700 dark:text-gray-300">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="use_free_ai"
+              checked={formData.use_free_ai}
+              onChange={handleChange}
+              className="mt-1 h-4 w-4"
+            />
+            <span>
+              <strong>Optional: write this plan with a free AI model.</strong> If ticked, the details you entered
+              above (what you want to plan, activity type, destination, date and times, special requirements) and
+              the disability types, severity levels and preferences saved in your profile are sent from your browser
+              to Pollinations.ai (a free third-party service, not OpenAI). Your name, email and location are not sent.
+              Pollinations may pass requests to other model providers, and their data handling applies. Do not
+              enter real health or personal details. If you leave this unticked, nothing leaves your browser and you
+              get a generic sample plan.
+            </span>
+          </label>
+        </div>
+      )}
 
       <Button type="submit" fullWidth loading={loading} size="lg">
         <Sparkles className="h-5 w-5" />
