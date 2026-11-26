@@ -145,9 +145,11 @@ export default function PlanForm({ onSubmit, loading }) {
               <strong>Optional: write this plan with a free AI model.</strong> If ticked, the details you entered
               above (what you want to plan, activity type, destination, date and times, special requirements) and
               the disability types, severity levels and preferences saved in your profile are sent from your browser
-              to Pollinations.ai (a free third-party service, not OpenAI). Your name, email and location are not sent.
-              Pollinations may pass requests to other model providers, and their data handling applies. Do not
-              enter real health or personal details. If you leave this unticked, nothing leaves your browser and you
+              to Pollinations.ai (a free third-party service, not OpenAI). Your name and email are not sent, and your saved
+              profile location is left out (a destination you type above is sent). Pollinations may pass requests to other
+              model providers, and their data handling applies. Read the{' '}
+              <a href="https://pollinations.ai/privacy" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 dark:text-blue-400">Pollinations privacy policy</a>{' '}
+              first. Do not enter real health or personal details. If you leave this unticked, nothing leaves your browser and you
               get a generic sample plan.
             </span>
           </label>
