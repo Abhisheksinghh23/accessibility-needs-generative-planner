@@ -14,7 +14,7 @@ export default function PlanNotice({ sample = !isOpenAIAvailable(), freeAi = fal
       <p>
         <strong>Not verified accessibility information.</strong>{' '}
         {generic && !freeAi
-          ? 'In this demo, plans are written by a free AI model (Pollinations.ai, not OpenAI) from what you enter, and can be wrong. If it is unavailable, a generic sample template is shown instead. Nothing here is based on real routes, venues or transport data. '
+          ? 'In this demo, plans are generic samples built in your browser unless you tick the optional free AI box (Pollinations.ai, not OpenAI), which sends what you entered to that service. AI plans can be wrong. Nothing here is based on real routes, venues or transport data. '
           : freeAi
           ? 'This plan was written by a free AI model (Pollinations.ai, not OpenAI) and can be wrong or make things up. It is not based on real routes, venues or transport data. '
           : sample
