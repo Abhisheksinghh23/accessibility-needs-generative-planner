@@ -1,5 +1,7 @@
 import { getStore, setStore, generateId, delay, getCurrentUserId, buildPlanForType, KEYS } from './mockData'
 import { isOpenAIAvailable, generateWithOpenAI } from './openaiService'
+import { generateWithFreeAI, FREE_AI_LABEL } from './freeAiService'
+import { IS_DEMO } from '../utils/navigation'
 
 function flattenPlan(plan) {
   if (!plan) return plan
@@ -29,6 +31,15 @@ export const generatePlan = async (activityInput) => {
       modelUsed = 'gpt-4o-mini'
     } catch (err) {
       console.warn('OpenAI call failed, falling back to mock templates:', err.message)
+      generatedPlan = buildPlanForType(activityInput.activity_type || 'custom', activityInput)
+      modelUsed = 'mock-local (fallback)'
+    }
+  } else if (IS_DEMO) {
+    try {
+      generatedPlan = await generateWithFreeAI(activityInput, getUserProfile())
+      modelUsed = FREE_AI_LABEL
+    } catch (err) {
+      console.warn('Free AI unavailable, using sample template:', err.message)
       generatedPlan = buildPlanForType(activityInput.activity_type || 'custom', activityInput)
       modelUsed = 'mock-local (fallback)'
     }
