@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react'
 import PlanForm from '../components/plans/PlanForm'
 import PlanViewer from '../components/plans/PlanViewer'
 import Card from '../components/common/Card'
+import PlanNotice from '../components/plans/PlanNotice'
 import usePlans from '../hooks/usePlans'
 
 export default function PlanGenerator() {
@@ -30,6 +31,7 @@ export default function PlanGenerator() {
               Describe your activity and we&apos;ll create a personalized accessibility plan.
             </p>
           </div>
+          <div className="mb-6"><PlanNotice /></div>
           <Card>
             <PlanForm onSubmit={handleGenerate} loading={loading} />
           </Card>
