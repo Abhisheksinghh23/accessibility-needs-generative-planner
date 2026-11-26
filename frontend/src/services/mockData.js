@@ -442,6 +442,9 @@ export function buildPlanForType(activityType, userInput = {}) {
       : template.title,
     activity_type: activityType,
     generated_at: new Date().toISOString(),
+    summary: userInput.description
+      ? `Generic ${activityType} checklist. It is not tailored to "${userInput.description.slice(0, 80)}" because the live AI was unavailable. Use it as a starting point only.`
+      : template.summary,
     generation_note: 'This plan was generated locally for demonstration purposes.',
     ...(userInput.destination && {
       route_info: { destination: userInput.destination, note: 'Route data available when Maps API is configured.' },
