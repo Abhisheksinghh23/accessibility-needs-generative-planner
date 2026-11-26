@@ -35,7 +35,7 @@ export function getCurrentUserId() {
 
 // ── Seed demo data on first load ────────────────────────────────────────────
 
-const SEED_VERSION = 2
+const SEED_VERSION = 3
 const DEMO_USER_ID = 'demo_user_001'
 const DEMO_PLAN_IDS = ['plan_demo_001', 'plan_demo_002', 'plan_demo_003']
 
@@ -50,7 +50,7 @@ function seedIfNeeded() {
     _id: DEMO_USER_ID,
     email: 'demo@accessplanner.com',
     password: 'Demo1234',
-    full_name: 'Abhishek Verma',
+    full_name: 'Demo User',
     role: 'admin',
     is_active: true,
     created_at: '2026-04-01T10:00:00.000Z',
@@ -152,7 +152,6 @@ function seedIfNeeded() {
   setStore(KEYS.FEEDBACKS, [demoFeedback])
 }
 
-seedIfNeeded()
 
 // ── Plan templates ──────────────────────────────────────────────────────────
 
@@ -454,3 +453,6 @@ export function buildPlanForType(activityType, userInput = {}) {
 }
 
 export { KEYS }
+
+// Run after the plan templates above are defined (seeding uses them).
+seedIfNeeded()
